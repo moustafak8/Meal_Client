@@ -4,10 +4,11 @@
     background-position: center;
     height: 100vh;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
     padding: 0 50px;
-    color: white;
+    color: #ff6b00;
     text-align: right;
 }
 
@@ -17,10 +18,15 @@
 }
 
 .Hero-wrapper h1 span {
-    color: orange;
+    color: green;
 }
 
 .Hero-wrapper p {
     font-size: 24px;
     margin-bottom: 30px;
+}
+.Hero-wrapper button{
+    margin-right: 10px;
+    padding: 12px 24px;
+    font-size: 18px;
 }

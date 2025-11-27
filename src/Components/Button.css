@@ -1,14 +1,23 @@
-.custom-button {
-    background-color: #ff6b00;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
+
+.custom-button  {
+  padding: 12px 24px;
+  border: none;
+  background: linear-gradient(135deg, #ff6b00 100%);
+  color: white;
+  cursor: pointer;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  min-width: 80px;
 }
 
 .custom-button:hover {
-    background-color: darkorange;
-    
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.custom-button:active {
+  transform: translateY(0);
 }
