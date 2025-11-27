@@ -1,0 +1,31 @@
+.navbar {
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    margin: 0;
+    box-shadow: 0 2px 4px rgba(218, 215, 215, 0.1);
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.navbar-logo {
+    color: #ff6b00;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo span {
+    color: green;
+}
+
+.navbar-logo svg {
+    margin-left: 5px;
+}

@@ -1,0 +1,26 @@
+.Hero-wrapper {
+    background-image: url('../assets/home-banner2.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 50px;
+    color: white;
+    text-align: right;
+}
+
+.Hero-wrapper h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.Hero-wrapper h1 span {
+    color: orange;
+}
+
+.Hero-wrapper p {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
