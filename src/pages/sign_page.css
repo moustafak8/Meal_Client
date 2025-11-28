@@ -1,9 +1,6 @@
-/* Sign-up form styles */
-
-
 form {
   max-width: 500px;
-  height: 400px;
+  height: auto;
   margin: 50px auto;
   padding: 20px;
   border: 1px solid #ccc;
@@ -51,7 +48,7 @@ form button {
   color: #007bff;
 }
 
-.last a{
+.last a {
   color: #007bff;
   text-decoration: none;
 }
@@ -59,4 +56,3 @@ form button {
 .last a:hover {
   text-decoration: underline;
 }
-

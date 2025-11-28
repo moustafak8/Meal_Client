@@ -10,7 +10,7 @@ export const Custom_footer = () => {
           <FontAwesomeIcon icon={faCarrot} />
           Meal<span>Planner</span>
         </h2>
-        <p>© 2024 Meal Planner. All rights reserved.</p>
+        <p>© 2025 Meal Planner. All rights reserved.</p>
       </div>
     </footer>
   </div>

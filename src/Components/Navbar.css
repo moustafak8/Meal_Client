@@ -1,6 +1,6 @@
 .navbar {
     background-color: #f8f9fa;
-    padding: 10px 20px;
+    padding: 5px 15px;
     margin: 0;
     box-shadow: 0 2px 4px whitesmoke;
 }
@@ -9,8 +9,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
+    margin: auto;
 }
 
 .navbar-logo {
