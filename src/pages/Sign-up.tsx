@@ -1,20 +1,33 @@
 import { useState, useRef, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./sign_page.css";
 import { Button } from "../Components/Button";
 import { Link } from "react-router-dom";
+import { faCancel } from "@fortawesome/free-solid-svg-icons/faCancel";
 export const Sign_up = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [cpassword, setcpassword] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
+  const [error, setError] = useState("");
+  const emailRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    inputRef.current?.focus();
+    emailRef.current?.focus();
   }, []);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle sign-up logic here
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long!");
+      return;
+    }
+    if (password !== cpassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!validEmail) {
+      setError("Please enter a valid email address!");
+      return;
+    }
     if (email.trim() && password.trim() && cpassword.trim()) {
       console.log("Sign-up details:", { email, password, cpassword });
       setemail("");
@@ -24,11 +37,19 @@ export const Sign_up = () => {
   };
   return (
     <>
+      {error && (
+        <div className="Alerts">
+          {error}
+          <button onClick={() => setError("")}>
+            <FontAwesomeIcon icon={faCancel} />
+          </button>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div>
           <label>Email:</label>
           <input
-            ref={inputRef}
+            ref={emailRef}
             type="email"
             value={email}
             onChange={(e) => setemail(e.target.value)}
@@ -36,7 +57,6 @@ export const Sign_up = () => {
           />
           <label>Password:</label>
           <input
-            ref={inputRef}
             type="password"
             value={password}
             onChange={(e) => setpassword(e.target.value)}
@@ -44,7 +64,6 @@ export const Sign_up = () => {
           />
           <label>Confirm Password:</label>
           <input
-            ref={inputRef}
             type="password"
             value={cpassword}
             onChange={(e) => setcpassword(e.target.value)}
@@ -53,7 +72,7 @@ export const Sign_up = () => {
         </div>
         <Button text="Sign Up" onClick={() => {}} />
         <span className="last">
-          Alread have an account ? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </span>
       </form>
     </>

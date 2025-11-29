@@ -11,8 +11,8 @@ export const Navbar = () => {
           <FontAwesomeIcon icon={faCarrot} />
           Meal<span>Planner</span>
         </h1>
-        <Link to="/sign-up">
-          <Button text="Login/SignUp" onClick={() => {}} />
+        <Link to="/Login">
+          <Button text="Login" onClick={() => {}} />
         </Link>
       </div>
     </nav>

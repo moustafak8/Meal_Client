@@ -1,12 +1,15 @@
 form {
-  max-width: 500px;
+  width: 500px;
   height: auto;
-  margin: 50px auto;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #f9f9f9;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 div {
@@ -55,4 +58,25 @@ form button {
 
 .last a:hover {
   text-decoration: underline;
+}
+.Alerts {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 2px solid red;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 300px;
+}
+
+.Alerts.show {
+  display: block; /* Show when the class is added */
 }

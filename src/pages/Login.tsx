@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 export const Login = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -13,13 +14,6 @@ export const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle sign-up logic here
-    if (email.trim() && password.trim() ) {
-      console.log("Sign-up details:", { email, password});
-      setemail("");
-      setpassword("");
-
-    }
   };
   return (
     <>
@@ -35,17 +29,15 @@ export const Login = () => {
           />
           <label>Password:</label>
           <input
-            ref={inputRef}
             type="password"
             value={password}
             onChange={(e) => setpassword(e.target.value)}
             required
           />
-          
         </div>
         <Button text="Sign Up" onClick={() => {}} />
         <span className="last">
-          Dont have an account ? <Link to="/sign-up">Sign-Up !</Link>
+          Dont have an account ? <Link to="/sign-up">Sign-Up</Link>
         </span>
       </form>
     </>
