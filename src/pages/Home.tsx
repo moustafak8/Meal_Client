@@ -1,5 +1,5 @@
-import { Herosection } from "../Components/Herosection";
-import { Cards } from "../Components/Cards";
+import { Herosection } from "../Components/Home/Herosection";
+import { Cards } from "../Components/Home/Cards";
 import { Custom_footer } from "../Components/Custom_footer";
 export const Home = ()=>{
     return(
