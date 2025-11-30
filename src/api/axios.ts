@@ -33,7 +33,7 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       // Redirect to login (will be handled by ProtectedRoute)
-      window.location.href = '/login';
+     // window.location.href = '/login';
     }
     return Promise.reject(error);
   }

@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import "./sign_page.css";
 import { Button } from "../Components/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { useLogin } from "../Context/loginContext";
 import { loginAPI } from "../api/auth";
-
+import { faX } from "@fortawesome/free-solid-svg-icons";
 export const Login = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
@@ -40,13 +41,13 @@ export const Login = () => {
         login(userData, token);
         
         // Redirect to home or dashboard
-        navigate("/");
+        navigate("/dashboard");
       } else {
         setError("Login failed. Please try again.");
       }
     } catch (err: any) {
       // Handle error from API
-      const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials.";
+      const errorMessage =  "Login failed. Please check your credentials.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -56,8 +57,11 @@ export const Login = () => {
   return (
     <>
       {error && (
-        <div className="Alerts" style={{ color: "red", marginBottom: "10px" }}>
+        <div className="Alerts">
           {error}
+          <button onClick={() => setError("")}>
+            <FontAwesomeIcon icon={faX} />
+          </button>
         </div>
       )}
       <form onSubmit={handleSubmit}>

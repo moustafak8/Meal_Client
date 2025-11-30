@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./sign_page.css";
 import { Button } from "../Components/Button";
 import { Link } from "react-router-dom";
-import { faCancel } from "@fortawesome/free-solid-svg-icons/faCancel";
 import { useLogin } from "../Context/loginContext";
 import { registerAPI } from "../api/auth";
+import { faX } from "@fortawesome/free-solid-svg-icons";
 
 export const Sign_up = () => {
   const [name, setName] = useState("");
@@ -75,7 +75,7 @@ export const Sign_up = () => {
         err.response?.data?.message ||
         err.message ||
         "Registration failed. Please try again.";
-      setError(errorMessage);
+      console.log(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export const Sign_up = () => {
         <div className="Alerts">
           {error}
           <button onClick={() => setError("")}>
-            <FontAwesomeIcon icon={faCancel} />
+            <FontAwesomeIcon icon={faX} />
           </button>
         </div>
       )}

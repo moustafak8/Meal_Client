@@ -6,7 +6,7 @@ import { Sign_up } from "./pages/Sign-up";
 import { Login } from "./pages/Login";
 import { LoginProvider } from "./Context/loginContext";
 import { ProtectedRoute } from "./Components/ProtectedRoute";
-import {Dashboard} from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
