@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link,  useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHome,
@@ -8,8 +8,12 @@ import {
   faHouse,
   faCarrot,
 } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "./Button";
+import { useLogin } from "../Context/loginContext";
 
 export const Sidebar = () => {
+    const {logout}=useLogin();
+    const navigate=useNavigate();
   return (
     <div className="sidebar">
       <Link to="/dashboard">
@@ -36,6 +40,7 @@ export const Sidebar = () => {
         <FontAwesomeIcon icon={faCalendar} />
         Meal Plan
       </Link>
+      <Button text="Logout" onClick={()=>{logout(); navigate("/login")}}/>
     </div>
   );
 };
