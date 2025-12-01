@@ -5,7 +5,6 @@ import {
   faBook,
   faShoppingCart,
   faCalendar,
-  faHouse,
   faCarrot,
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./Button";
@@ -19,10 +18,6 @@ export const Sidebar = () => {
       <Link to="/dashboard">
         <FontAwesomeIcon icon={faHome} />
         Dashboard
-      </Link>
-      <Link to="dashboard/household">
-        <FontAwesomeIcon icon={faHouse} />
-        Household
       </Link>
       <Link to="dashboard/pantry">
         <FontAwesomeIcon icon={faCarrot} />
