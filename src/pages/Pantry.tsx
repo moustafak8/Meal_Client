@@ -1,44 +1,95 @@
-import { Form } from "../Components/Form"
-import {useState} from "react";
-import { useNavigate } from "react-router-dom"
+import { Form } from "../Components/Form";
+import { useState } from "react";
 import { Button } from "../Components/Button";
-export const Pantry = () =>{
-    /*
-    const [name, setName] = useState("")
-    const [quantity, setQuantity] = useState(0)
-    const [unit, setUnit] = useState("")
-    const [category, setCategory] = useState("")
-    const [error, setError] = useState("")
-    const [loading, setLoading] = useState(false)
-    const navigate = useNavigate()
-    const handleSubmit2 = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setError("")
-        setLoading(true)
-        try {
-            const response = await addPantryItem(name, quantity, unit, category)
-        }
-        catch (error) {
-            setError("Failed to add pantry item")
-        }
-        finally {
-            setLoading(false)
-        }
-    }
-        */
+import { membersAPI } from "../api/pantry";
+import { Sidebar } from "../Components/Sidebar";
+import "./maindashboard.css";
 
-    const handleSubmit1 = (e: React.FormEvent<HTMLFormElement>)=>{
-        e.preventDefault()
+export const Pantry = () => {
+  const storedUser = localStorage.getItem("user");
+  let userid: string | null = null;
+
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser);
+      userid = (parsed?.id ?? parsed?.user?.id ?? parsed)?.toString() ?? null;
+    } catch {
+      userid = storedUser;
     }
-    const handlejoinhousehold = ()=>{
-        <Form onSubmit={handleSubmit1}>
-            <input type="text" placeholder="Enter the invitation code" />
-            <button type="submit">Join</button>
-        </Form>
+  }
+
+  const [invitecode, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showJoinForm, setShowJoinForm] = useState(false);
+
+  const handleJoinSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!userid) {
+      setError("Please log in again before joining a household.");
+      return;
     }
-    return (
-        <div>
-            <Button text="Join a Houshold" onClick={handlejoinhousehold} />
-        </div>
-    );
+
+    setLoading(true);
+    try {
+      const response = await membersAPI(invitecode.trim(), userid);
+      console.log("Join household response:", response);
+      setSuccess("Household joined successfully.");
+      setShowJoinForm(false);
+      setCode("");
+    } catch (err: any) {
+      //  backend error if available
+      console.error("Join household error:", err?.response ?? err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        JSON.stringify(err?.response?.data || {});
+      setError(
+        `Failed to join household. Server said: ${
+          backendMessage || "Unknown error"
+        }`
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="dashboard-layout">
+      <Sidebar />
+      <main className="dashboard-content">
+        <h1>Pantry</h1>
+        <p>Manage all your Available item and discover recipe ideas</p>
+        <Button
+          text={showJoinForm ? "Cancel" : "Join a Household"}
+          onClick={() => {
+            setShowJoinForm((prev) => !prev);
+            setError("");
+            setSuccess("");
+          }}
+        />
+        {showJoinForm && (
+          <Form onSubmit={handleJoinSubmit} className="dashboard-form">
+            <input
+              type="text"
+              placeholder="Enter the invitation code"
+              value={invitecode}
+              onChange={(e) => setCode(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <button type="submit" disabled={loading || !invitecode.trim()}>
+              {loading ? "Joining..." : "Join"}
+            </button>
+          </Form>
+        )}
+        {error && <p className="form-error">{error}</p>}
+        {success && <p className="form-success">{success}</p>}
+      </main>
+    </div>
+  );
 };

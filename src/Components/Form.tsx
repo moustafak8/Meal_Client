@@ -1,9 +1,11 @@
 import React from "react";
+import "./Form.css";
 
 type FormProps = {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   /** Form content: inputs, buttons, etc. */
   children: React.ReactNode;
+  /** Additional class names; `.dashboard-form` is the common dashboard style */
   className?: string;
 };
 

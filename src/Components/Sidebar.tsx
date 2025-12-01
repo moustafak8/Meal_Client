@@ -8,6 +8,7 @@ import {
   faCarrot,
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./Button";
+import "./Sidebar.css";
 import { useLogin } from "../Context/loginContext";
 
 export const Sidebar = () => {
@@ -19,7 +20,7 @@ export const Sidebar = () => {
         <FontAwesomeIcon icon={faHome} />
         Dashboard
       </Link>
-      <Link to="dashboard/pantry">
+      <Link to="/dashboard/pantry">
         <FontAwesomeIcon icon={faCarrot} />
         Pantry
       </Link>

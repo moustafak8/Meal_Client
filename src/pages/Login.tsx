@@ -66,19 +66,20 @@ export const Login = () => {
       )}
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Email:</label>
+          <p className="title">Welcome back</p>
           <input
             ref={inputRef}
             type="email"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setemail(e.target.value)}
             required
             disabled={loading}
           />
-          <label>Password:</label>
           <input
             type="password"
             value={password}
+            placeholder="Enter your password"
             onChange={(e) => setpassword(e.target.value)}
             required
             disabled={loading}

@@ -22,16 +22,16 @@ export interface members {
     };
   }
 export const householdAPI = async (name:string , invite_code:string): Promise<household> => {
-    const response = await api.post<household>('/add_update_household/add',{
+    const response = await api.post<household>('v0.1/user/add_update_household/add',{
         name,
         invite_code
     });
     return response.data;
 };
-export const membersAPI = async (household_id:number , user_id:number): Promise<members> => {
-    const response = await api.post<members>('/add_update_members/add',{
-        household_id,
-        user_id
+export const membersAPI = async (invitecode:string , userid:string): Promise<members> => {
+    const response = await api.post<members>('v0.1/user/add_update_members/add',{
+        invitecode,
+        userid
     });
     return response.data;
 };
