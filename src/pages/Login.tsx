@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { useLogin } from "../Context/loginContext";
 import { loginAPI } from "../api/auth";
+import { gethousehold_id } from "../api/pantry";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 export const Login = () => {
   const [email, setemail] = useState("");
@@ -36,9 +37,14 @@ export const Login = () => {
       if (response.status === "success" && response.payload) {
         // Extract user data (without token) and token separately
         const { token, ...userData } = response.payload;
-        
-        // Call login from context to store token and user data
         login(userData, token);
+        
+        // Fetch and store household_id after successful authentication
+        try {
+          await gethousehold_id(String(userData.id));
+        } catch (householdErr) {
+          console.warn("Failed to fetch household_id:", householdErr);
+        }
         
         // Redirect to home or dashboard
         navigate("/dashboard");

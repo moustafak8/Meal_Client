@@ -53,6 +53,7 @@ export const LoginProvider = ({children}: {children: ReactNode}): JSX.Element =>
         setToken(null);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('household_id');
     };
 
     const isAuthenticated = !!token && !!user;

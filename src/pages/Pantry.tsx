@@ -1,7 +1,7 @@
 import { Form } from "../Components/Form";
 import { useState, useEffect } from "react";
 import { Button } from "../Components/Button";
-import { householdAPI, getUnit, type unit } from "../api/pantry";
+import { getUnit, addItem, type unit } from "../api/pantry";
 import { Sidebar } from "../Components/Sidebar";
 import "./maindashboard.css";
 
@@ -20,14 +20,14 @@ export const Pantry = () => {
   const [name, setName] = useState("");
   const [unitId, setUnitId] = useState<number | null>(null);
   const [units, setUnits] = useState<unit[]>([]);
-  const [qty, setQty] = useState(0);
+  const [qty, setQty] = useState<number>(0);
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
+  const [householdId, setHouseholdId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loadingUnits, setLoadingUnits] = useState(false);
-  const [invite_code, setInvitecode] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Fetch units on component mount
@@ -46,33 +46,67 @@ export const Pantry = () => {
     };
     fetchUnits();
   }, []);
+  useEffect(() => {
+    const storedHouseholdId = localStorage.getItem("household_id");
+    if (storedHouseholdId) {
+      setHouseholdId(storedHouseholdId);
+    }
+  }, []);
   const handleAddSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // Validation
+    if (!householdId || householdId.trim() === "") {
+      setError("Please enter a household ID.");
+      return;
+    }
+
+    if (!unitId) {
+      setError("Please select a unit.");
+      return;
+    }
+
+    if (!userid) {
+      setError("Please log in again.");
+      return;
+    }
+
+    if (qty <= 0) {
+      setError("Quantity must be greater than 0.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await householdAPI(
+      const response = await addItem(
+        householdId,
+        userid,
+        unitId!,
         name.trim(),
-        invite_code.trim(),
-        userid
+        qty,
+        date,
+        location.trim()
       );
-      console.log("Add household response:", response);
-      setSuccess("Household Created successfully.");
+      console.log("Add item response:", response);
+      setSuccess("Item added to pantry successfully!");
       setShowAddForm(false);
+      // Reset form
       setName("");
-      setInvitecode("");
+      setQty(0);
+      setUnitId(null);
+      setDate("");
+      setLocation("");
     } catch (err: any) {
-      //  backend error if available
-      console.error("Join household error:", err?.response ?? err);
+      console.error("Add item error:", err?.response ?? err);
       const backendMessage =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
+        err?.response?.data?.status ||
         JSON.stringify(err?.response?.data || {});
       setError(
-        `Failed to join household. Server said: ${
-          backendMessage || "Unknown error"
-        }`
+        `Failed to add item. ${backendMessage || "Unknown error"}`
       );
     } finally {
       setLoading(false);
