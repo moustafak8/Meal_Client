@@ -21,6 +21,32 @@ export interface members {
       updated_at: string;
     };
   }
+  export interface items {
+    status: string;
+    payload: {
+      id: number;
+      household_id:number;
+      added_by: number;
+      unit_id:number;
+      name:string;
+      quantity:number;
+      expiration_date:string;
+      location:string;
+      created_at: string;
+      updated_at: string;
+    };
+  }
+  export interface unit{
+    id: number;
+    name:string;
+    created_at: string;
+    updated_at: string;
+  }
+
+  export interface unitsResponse {
+    status: string;
+    payload: unit[];
+  }
 export const householdAPI = async (name:string , invite_code:string , userid:string): Promise<household> => {
     const response = await api.post<household>('v0.1/user/add_update_household/add',{
         name,
@@ -35,6 +61,10 @@ export const membersAPI = async (invitecode:string , userid:string): Promise<mem
         userid
     });
     return response.data;
+};
+export const getUnit = async (): Promise<unitsResponse> => {
+  const response = await api.post<unitsResponse>('v0.1/user/unit/');
+  return response.data;
 };
 
     
