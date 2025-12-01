@@ -18,10 +18,12 @@ export const Pantry = () => {
     }
   }
 
-  const [invitecode, setCode] = useState("");
+  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [name , setName]=useState("");
+  const [invite_code , setInvitecode]=useState("");
   const [showJoinForm, setShowJoinForm] = useState(false);
 
   const handleJoinSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,7 +38,7 @@ export const Pantry = () => {
 
     setLoading(true);
     try {
-      const response = await membersAPI(invitecode.trim(), userid);
+      const response = await membersAPI(code.trim(), userid);
       console.log("Join household response:", response);
       setSuccess("Household joined successfully.");
       setShowJoinForm(false);
@@ -77,12 +79,12 @@ export const Pantry = () => {
             <input
               type="text"
               placeholder="Enter the invitation code"
-              value={invitecode}
+              value={code}
               onChange={(e) => setCode(e.target.value)}
               required
               disabled={loading}
             />
-            <button type="submit" disabled={loading || !invitecode.trim()}>
+            <button type="submit" disabled={loading || !code.trim()}>
               {loading ? "Joining..." : "Join"}
             </button>
           </Form>
