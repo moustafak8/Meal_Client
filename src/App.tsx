@@ -29,6 +29,6 @@ function App() {
       </Router>
     </LoginProvider>
   );
-}
+};
 
 export default App;
