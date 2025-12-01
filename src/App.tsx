@@ -7,6 +7,7 @@ import { Login } from "./pages/Login";
 import { LoginProvider } from "./Context/loginContext";
 import { ProtectedRoute } from "./Components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import { Pantry } from "./pages/Pantry";
 
 function App() {
   return (
@@ -17,18 +18,30 @@ function App() {
           <Route path="/" Component={Home} />
           <Route path="/sign-up" Component={Sign_up} />
           <Route path="/login" Component={Login} />
-          { <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          /> }
+          {
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+          }
+          {
+            <Route
+              path="/dashboard/pantry"
+              element={
+                <ProtectedRoute>
+                  <Pantry />
+                </ProtectedRoute>
+              }
+            />
+          }
         </Routes>
       </Router>
     </LoginProvider>
   );
-}
+};
 
 export default App;

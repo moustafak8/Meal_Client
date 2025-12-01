@@ -11,6 +11,13 @@ form {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+.title {
+  text-align: center;
+  font-family:'Times New Roman', Times, serif;
+  margin: 10px 0 30px 0;
+  font-size: 28px;
+  font-weight: 800;
+}
 
 div {
   margin-bottom: 15px;

@@ -6,6 +6,7 @@ import { Button } from "../Components/Button";
 import { Link } from "react-router-dom";
 import { useLogin } from "../Context/loginContext";
 import { registerAPI } from "../api/auth";
+import { gethousehold_id } from "../api/pantry";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 
 export const Sign_up = () => {
@@ -60,10 +61,13 @@ export const Sign_up = () => {
       if (response.status === "success" && response.payload) {
         // Extract user data (without token) and token separately
         const { token, ...userData } = response.payload;
-
-        // Call login from context to store token and user data
         login(userData, token);
-
+        try {
+          await gethousehold_id(String(userData.id));
+        } catch (householdErr) {
+          // Log error but don't block registration if household_id fetch fails
+          console.warn("Failed to fetch household_id:", householdErr);
+        }
         // Redirect to home or dashboard
         navigate("/");
       } else {
@@ -92,35 +96,36 @@ export const Sign_up = () => {
       )}
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Name:</label>
+          <p className="title">Sign Up</p>
           <input
             ref={nameRef}
             type="text"
             value={name}
+            placeholder="Enter your name"
             onChange={(e) => setName(e.target.value)}
             required
             disabled={loading}
           />
-          <label>Email:</label>
           <input
             type="email"
             value={email}
+            placeholder="Enter your email"
             onChange={(e) => setemail(e.target.value)}
             required
             disabled={loading}
           />
-          <label>Password:</label>
           <input
             type="password"
             value={password}
+            placeholder="Enter your password"
             onChange={(e) => setpassword(e.target.value)}
             required
             disabled={loading}
           />
-          <label>Confirm Password:</label>
           <input
             type="password"
             value={cpassword}
+            placeholder="Confirm your password"
             onChange={(e) => setcpassword(e.target.value)}
             required
             disabled={loading}

@@ -1,10 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCarrot } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./Button";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Navbar.css";
+import { useLogin } from "../Context/loginContext";
 
 export const Navbar = () => {
+  const { isAuthenticated } = useLogin();
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -14,9 +17,11 @@ export const Navbar = () => {
             Meal<span>Planner</span>
           </h1>
         </Link>
-        <Link to="/login">
-          <Button text="Login" onClick={() => {}} />
-        </Link>
+        {!isAuthenticated && (
+          <Link to="/login">
+            <Button text="Login" onClick={() => {}} />
+          </Link>
+        )}
       </div>
     </nav>
   );
