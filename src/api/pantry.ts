@@ -21,10 +21,11 @@ export interface members {
       updated_at: string;
     };
   }
-export const householdAPI = async (name:string , invite_code:string): Promise<household> => {
+export const householdAPI = async (name:string , invite_code:string , userid:string): Promise<household> => {
     const response = await api.post<household>('v0.1/user/add_update_household/add',{
         name,
-        invite_code
+        invite_code,
+        userid
     });
     return response.data;
 };

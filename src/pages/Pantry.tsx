@@ -1,7 +1,7 @@
 import { Form } from "../Components/Form";
 import { useState } from "react";
 import { Button } from "../Components/Button";
-import { membersAPI } from "../api/pantry";
+import { membersAPI ,householdAPI } from "../api/pantry";
 import { Sidebar } from "../Components/Sidebar";
 import "./maindashboard.css";
 
@@ -37,9 +37,9 @@ export const Pantry = () => {
 
     setLoading(true);
     try {
-      const response = await membersAPI(code.trim(), userid);
-      console.log("Join household response:", response);
-      setSuccess("Household joined successfully.");
+      const response = await householdAPI(name.trim(), invite_code.trim(), userid);
+      console.log("Add household response:", response);
+      setSuccess("Household Created successfully.");
       setShowJoinForm(false);
       setCode("");
     } catch (err: any) {
