@@ -95,6 +95,7 @@ export const Login = () => {
           text={loading ? "Logging in..." : "Login"} 
           onClick={() => {}} 
           disabled={loading}
+          type="submit"
         />
         <span className="last">
           Dont have an account ? <Link to="/sign-up">Sign-Up</Link>
