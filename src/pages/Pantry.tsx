@@ -1,9 +1,16 @@
 import { Form } from "../Components/Form";
 import { useState, useEffect } from "react";
-import { getUnit, addItem, getPantryItems, type unit, type item } from "../api/pantry";
+import {
+  getUnit,
+  addItem,
+  getPantryItems,
+  consumeItem,
+  type unit,
+  type item,
+} from "../api/pantry";
 import { Sidebar } from "../Components/Sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faUtensils, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faUtensils, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./maindashboard.css";
 import "./pantry.css";
 
@@ -34,6 +41,10 @@ export const Pantry = () => {
   const [pantryItems, setPantryItems] = useState<item[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const [showConsumeForm, setShowConsumeForm] = useState(false);
+  const [consumeItemId, setConsumeItemId] = useState<number | null>(null);
+  const [consumeQty, setConsumeQty] = useState<number>(0);
+  const [consumeReason, setConsumeReason] = useState("");
 
   // Fetch units on component mount
   useEffect(() => {
@@ -171,10 +182,77 @@ export const Pantry = () => {
     }
   };
 
-  const handleConsume = async (itemId: number) => {
-    // TODO: Implement consume functionality
-    console.log("Consume item:", itemId);
-    alert(`Consume functionality for item ${itemId} - to be implemented`);
+  const handleConsume = (itemId: number) => {
+    const item = pantryItems.find((i) => i.id === itemId);
+    if (!item) return;
+
+    setConsumeItemId(itemId);
+    setConsumeQty(item.quantity > 0 ? item.quantity : 1);
+    setConsumeReason("");
+    setError("");
+    setSuccess("");
+    setShowConsumeForm(true);
+  };
+
+  const handleConsumeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!userid) {
+      setError("Please log in again.");
+      return;
+    }
+
+    if (!consumeItemId) {
+      setError("No item selected to consume.");
+      return;
+    }
+
+    if (consumeQty <= 0) {
+      setError("Consumed quantity must be greater than 0.");
+      return;
+    }
+
+    const originalItem = pantryItems.find((i) => i.id === consumeItemId);
+    if (originalItem && consumeQty > originalItem.quantity) {
+      setError("Consumed quantity cannot exceed available quantity.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await consumeItem(
+        consumeItemId,
+        userid,
+        consumeQty,
+        consumeReason.trim()
+      );
+      console.log("Consume item response:", response);
+      setSuccess("Item consumption saved successfully!");
+
+      // Refresh pantry items to reflect updated quantities
+      if (householdId) {
+        const refreshed = await getPantryItems(householdId);
+        setPantryItems(refreshed.payload || []);
+      }
+
+      // Reset consume form state
+      setShowConsumeForm(false);
+      setConsumeItemId(null);
+      setConsumeQty(0);
+      setConsumeReason("");
+    } catch (err: any) {
+      console.error("Consume item error:", err?.response ?? err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.status ||
+        JSON.stringify(err?.response?.data || {});
+      setError(`Failed to save consumption. ${backendMessage || "Unknown error"}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getUnitName = (unitId: number) => {
@@ -294,9 +372,6 @@ export const Pantry = () => {
                     <button className="consume-btn" onClick={() => handleConsume(item.id)}>
                       Consume
                     </button>
-                    <button className="edit-btn" title="Edit">
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
                     <button className="delete-btn" title="Delete">
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
@@ -306,6 +381,60 @@ export const Pantry = () => {
             })
           )}
         </div>
+
+        {/* Consume Item Form */}
+        {showConsumeForm && (
+          <Form onSubmit={handleConsumeSubmit} className="dashboard-form consume-form">
+            <h2>Consume Item</h2>
+            {consumeItemId && (
+              <p>
+                Consuming:{" "}
+                {
+                  pantryItems.find((i) => i.id === consumeItemId)?.name
+                }{" "}
+                (Available:{" "}
+                {
+                  pantryItems.find((i) => i.id === consumeItemId)
+                    ?.quantity
+                }
+                )
+              </p>
+            )}
+            <input
+              type="number"
+              placeholder="Quantity consumed"
+              onChange={(e) => setConsumeQty(e.target.valueAsNumber)}
+              min={1}
+              required
+              disabled={loading}
+            />
+            <input
+              type="text"
+              placeholder="Reason (e.g. Breakfast , Lunch , etc..)"
+              value={consumeReason}
+              onChange={(e) => setConsumeReason(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <div className="consume-form-actions">
+              <button type="submit" disabled={loading || consumeQty <= 0}>
+                {loading ? "Saving..." : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowConsumeForm(false);
+                  setConsumeItemId(null);
+                  setConsumeQty(0);
+                  setConsumeReason("");
+                }}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+            </div>
+          </Form>
+        )}
       </main>
     </div>
   );
