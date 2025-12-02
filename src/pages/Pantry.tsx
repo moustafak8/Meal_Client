@@ -5,12 +5,16 @@ import {
   addItem,
   getPantryItems,
   consumeItem,
+  getAISuggestions,
+  saveRecipeFromAI,
   type unit,
   type item,
+  type Recipe,
 } from "../api/pantry";
 import { Sidebar } from "../Components/Sidebar";
+import { PantryItemsList } from "../Components/PantryItemsList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faUtensils, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import "./maindashboard.css";
 import "./pantry.css";
 
@@ -45,6 +49,10 @@ export const Pantry = () => {
   const [consumeItemId, setConsumeItemId] = useState<number | null>(null);
   const [consumeQty, setConsumeQty] = useState<number>(0);
   const [consumeReason, setConsumeReason] = useState("");
+  const [showRecipePopup, setShowRecipePopup] = useState(false);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loadingRecipes, setLoadingRecipes] = useState(false);
+  const [savedRecipes, setSavedRecipes] = useState<Set<number>>(new Set());
 
   // Fetch units on component mount
   useEffect(() => {
@@ -73,7 +81,7 @@ export const Pantry = () => {
   useEffect(() => {
     const fetchPantryItems = async () => {
       if (!householdId) return;
-      
+
       setLoadingItems(true);
       try {
         const response = await getPantryItems(householdId);
@@ -249,15 +257,96 @@ export const Pantry = () => {
         err?.response?.data?.error ||
         err?.response?.data?.status ||
         JSON.stringify(err?.response?.data || {});
-      setError(`Failed to save consumption. ${backendMessage || "Unknown error"}`);
+      setError(
+        `Failed to save consumption. ${backendMessage || "Unknown error"}`
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const getUnitName = (unitId: number) => {
-    const unit = units.find((u) => u.id === unitId);
-    return unit ? unit.name : "";
+
+  const handleDiscoverRecipes = async () => {
+    setError("");
+    setSuccess("");
+    setLoadingRecipes(true);
+    setShowRecipePopup(true);
+
+    try {
+      // Determine if all items are selected or some items
+      const allSelected =
+        selectedItems.size === pantryItems.length && pantryItems.length > 0;
+
+      let itemIds: number[] | undefined;
+      if (!allSelected && selectedItems.size > 0) {
+        // Some items selected - send IDs
+        itemIds = Array.from(selectedItems);
+      }
+      // If allSelected, itemIds remains undefined (no query params)
+
+      const response = await getAISuggestions(itemIds);
+      setRecipes(response.payload?.recipes || []);
+      setSavedRecipes(new Set()); // Reset saved recipes
+    } catch (err: any) {
+      console.error("Failed to fetch recipe suggestions:", err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.status ||
+        JSON.stringify(err?.response?.data || {});
+      setError(
+        `Failed to fetch recipe suggestions. ${
+          backendMessage || "Unknown error"
+        }`
+      );
+      setShowRecipePopup(false);
+    } finally {
+      setLoadingRecipes(false);
+    }
+  };
+
+  const handleSaveRecipe = async (recipeIndex: number) => {
+    const recipe = recipes[recipeIndex];
+    if (!recipe) return;
+
+    // Prevent duplicate saves
+    if (savedRecipes.has(recipeIndex)) return;
+
+    if (!userid) {
+      setError("Please log in again.");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await saveRecipeFromAI(recipe, userid);
+      console.log("Save recipe response:", response);
+
+      // Mark as saved only on success
+      setSavedRecipes((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(recipeIndex);
+        return newSet;
+      });
+
+      setSuccess(`Recipe "${recipe.name}" saved successfully!`);
+    } catch (err: any) {
+      console.error("Failed to save recipe:", err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.status ||
+        JSON.stringify(err?.response?.data || {});
+      setError(`Failed to save recipe. ${backendMessage || "Unknown error"}`);
+    }
+  };
+
+  const handleCloseRecipePopup = () => {
+    setShowRecipePopup(false);
+    setRecipes([]);
+    setSavedRecipes(new Set());
   };
 
   return (
@@ -265,7 +354,9 @@ export const Pantry = () => {
       <Sidebar />
       <main className="dashboard-content">
         <h1 className="pantry-title">Pantry</h1>
-        <p className="pantry-subtitle">Manage your available ingredients and discover recipe ideas</p>
+        <p className="pantry-subtitle">
+          Manage your available ingredients and discover recipe ideas
+        </p>
 
         <div className="pantry-actions">
           <button
@@ -338,9 +429,17 @@ export const Pantry = () => {
         {/* Recipe Discovery Panel */}
         {pantryItems.length > 0 && (
           <div className="recipe-discovery-panel">
-            <button className="discover-recipes-btn">
+            <button
+              className="discover-recipes-btn"
+              onClick={handleDiscoverRecipes}
+              disabled={loadingRecipes}
+            >
               <FontAwesomeIcon icon={faUtensils} />
-              Discover Recipes with {selectedItems.size || pantryItems.length} Item{selectedItems.size !== 1 ? "s" : ""}
+              {loadingRecipes
+                ? "Loading..."
+                : `Discover Recipes with ${
+                    selectedItems.size || pantryItems.length
+                  } Item${selectedItems.size !== 1 ? "s" : ""}`}
             </button>
             <span className="select-all-link" onClick={handleSelectAll}>
               Select All
@@ -349,55 +448,30 @@ export const Pantry = () => {
         )}
 
         {/* Pantry Items List */}
-        <div className="pantry-items-container">
-          {loadingItems ? (
-            <p>Loading pantry items...</p>
-          ) : pantryItems.length === 0 ? (
-            <p className="no-items">No items in pantry yet. Add some ingredients to get started!</p>
-          ) : (
-            pantryItems.map((item) => {
-              const unitName = getUnitName(item.unit_id);
-              return (
-                <div key={item.id} className="pantry-item-row">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.has(item.id)}
-                    onChange={() => handleToggleSelect(item.id)}
-                    className="item-checkbox"
-                  />
-                  <span className="item-name">
-                    {item.quantity} {unitName} {item.name}
-                  </span>
-                  <div className="item-actions">
-                    <button className="consume-btn" onClick={() => handleConsume(item.id)}>
-                      Consume
-                    </button>
-                    <button className="delete-btn" title="Delete">
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+        <PantryItemsList
+          items={pantryItems}
+          units={units}
+          loading={loadingItems}
+          selectedItems={selectedItems}
+          onToggleSelect={handleToggleSelect}
+          onConsume={handleConsume}
+          showCheckboxes={true}
+          showActions={true}
+        />
 
         {/* Consume Item Form */}
         {showConsumeForm && (
-          <Form onSubmit={handleConsumeSubmit} className="dashboard-form consume-form">
+          <Form
+            onSubmit={handleConsumeSubmit}
+            className="dashboard-form consume-form"
+          >
             <h2>Consume Item</h2>
             {consumeItemId && (
               <p>
                 Consuming:{" "}
-                {
-                  pantryItems.find((i) => i.id === consumeItemId)?.name
-                }{" "}
+                {pantryItems.find((i) => i.id === consumeItemId)?.name}{" "}
                 (Available:{" "}
-                {
-                  pantryItems.find((i) => i.id === consumeItemId)
-                    ?.quantity
-                }
-                )
+                {pantryItems.find((i) => i.id === consumeItemId)?.quantity})
               </p>
             )}
             <input
@@ -434,6 +508,93 @@ export const Pantry = () => {
               </button>
             </div>
           </Form>
+        )}
+
+        {/* Recipe Suggestions Popup */}
+        {showRecipePopup && (
+          <div
+            className="recipe-popup-overlay"
+            onClick={handleCloseRecipePopup}
+          >
+            <div
+              className="recipe-popup-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="recipe-popup-header">
+                <h2>Recipe Suggestions</h2>
+                <button
+                  className="recipe-popup-close"
+                  onClick={handleCloseRecipePopup}
+                >
+                  ×
+                </button>
+              </div>
+              <div className="recipe-popup-body">
+                {loadingRecipes ? (
+                  <div className="recipe-loading">
+                    <p>Generating recipe suggestions...</p>
+                  </div>
+                ) : recipes.length === 0 ? (
+                  <div className="recipe-empty">
+                    <p>No recipes found. Try selecting different items.</p>
+                  </div>
+                ) : (
+                  <div className="recipes-list">
+                    {recipes.map((recipe, index) => (
+                      <div key={index} className="recipe-card">
+                        <div className="recipe-header">
+                          <h3 className="recipe-name">{recipe.name}</h3>
+                          <button
+                            className={`recipe-save-btn ${
+                              savedRecipes.has(index) ? "saved" : ""
+                            }`}
+                            onClick={() => handleSaveRecipe(index)}
+                            disabled={savedRecipes.has(index)}
+                          >
+                            {savedRecipes.has(index) ? "✓ Saved" : "Save"}
+                          </button>
+                        </div>
+                        <div className="recipe-section">
+                          <h4>Ingredients:</h4>
+                          <ul className="recipe-ingredients">
+                            {recipe.ingredients.map((ingredient, idx) => (
+                              <li key={idx}>
+                                {ingredient.quantity} {ingredient.unit}{" "}
+                                {ingredient.name}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="recipe-section">
+                          <h4>Instructions:</h4>
+                          <p className="recipe-instructions">
+                            {recipe.instructions}
+                          </p>
+                        </div>
+                        {recipe.tags && (
+                          <div className="recipe-tags">
+                            {recipe.tags.split(",").map((tag, idx) => (
+                              <span key={idx} className="recipe-tag">
+                                {tag.trim()}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="recipe-popup-footer">
+                <button
+                  className="recipe-popup-cancel"
+                  onClick={handleCloseRecipePopup}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>

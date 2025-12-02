@@ -141,3 +141,54 @@ export const consumeItem = async (
   );
   return response.data;
 };
+
+export interface RecipeIngredient {
+  name: string;
+  quantity: string;
+  unit: string;
+}
+
+export interface Recipe {
+  name: string;
+  ingredients: RecipeIngredient[];
+  instructions: string;
+  tags: string;
+}
+
+export interface RecipeSuggestionsResponse {
+  status: string;
+  payload: {
+    recipes: Recipe[];
+  };
+}
+
+export const getAISuggestions = async (
+  itemIds?: number[]
+): Promise<RecipeSuggestionsResponse> => {
+  let url = "v0.1/user/ai_suggestions";
+  if (itemIds && itemIds.length > 0) {
+    const idsParam = itemIds.join(",");
+    url = `v0.1/user/ai_suggestions/?id=${idsParam}`;
+  }
+  const response = await api.post<RecipeSuggestionsResponse>(url);
+  return response.data;
+};
+
+export interface SaveRecipeResponse {
+  status: string;
+  payload?: any;
+}
+
+export const saveRecipeFromAI = async (
+  recipe: Recipe,
+  user_id: string | number
+): Promise<SaveRecipeResponse> => {
+  const response = await api.post<SaveRecipeResponse>(
+    "v0.1/user/add_recipes_from_ai",
+    {
+      ...recipe,
+      user_id: String(user_id),
+    }
+  );
+  return response.data;
+};
