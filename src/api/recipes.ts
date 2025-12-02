@@ -14,6 +14,6 @@ export interface Recipe {
     payload:Recipe[];
   }
   export const getrecipes= async():Promise<reciperesponse>=>{
-    const response=await api.get<reciperesponse>('api/v0.1/user/recipes');
+    const response=await api.get<reciperesponse>('v0.1/user/recipes');
     return response.data;
   }

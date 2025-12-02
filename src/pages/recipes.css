@@ -1,0 +1,32 @@
+
+.pantry-item-row h3 {
+  margin: 0 0 0.5rem 0;
+  color: #f97316;
+  font-size: 1.1rem;
+}
+.pantry-item-row p {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.recipe-content {
+  flex: 1;
+}
+
+.recipe-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.recipe-tag {
+  background-color: #f97316;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
