@@ -1,9 +1,11 @@
 import { Form } from "../Components/Form";
 import { useState, useEffect } from "react";
-import { Button } from "../Components/Button";
-import { getUnit, addItem, type unit } from "../api/pantry";
+import { getUnit, addItem, getPantryItems, type unit, type item } from "../api/pantry";
 import { Sidebar } from "../Components/Sidebar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faUtensils, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./maindashboard.css";
+import "./pantry.css";
 
 export const Pantry = () => {
   const storedUser = localStorage.getItem("user");
@@ -29,6 +31,9 @@ export const Pantry = () => {
   const [success, setSuccess] = useState("");
   const [loadingUnits, setLoadingUnits] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [pantryItems, setPantryItems] = useState<item[]>([]);
+  const [loadingItems, setLoadingItems] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   // Fetch units on component mount
   useEffect(() => {
@@ -52,6 +57,41 @@ export const Pantry = () => {
       setHouseholdId(storedHouseholdId);
     }
   }, []);
+
+  // Fetch pantry items when householdId is available
+  useEffect(() => {
+    const fetchPantryItems = async () => {
+      if (!householdId) return;
+      
+      setLoadingItems(true);
+      try {
+        const response = await getPantryItems(householdId);
+        setPantryItems(response.payload || []);
+      } catch (err) {
+        console.error("Failed to fetch pantry items:", err);
+        setError("Failed to load pantry items. Please refresh the page.");
+      } finally {
+        setLoadingItems(false);
+      }
+    };
+    fetchPantryItems();
+  }, [householdId]);
+
+  // Refetch items after successful addition
+  useEffect(() => {
+    if (success && success.includes("added")) {
+      const fetchPantryItems = async () => {
+        if (!householdId) return;
+        try {
+          const response = await getPantryItems(householdId);
+          setPantryItems(response.payload || []);
+        } catch (err) {
+          console.error("Failed to refresh pantry items:", err);
+        }
+      };
+      fetchPantryItems();
+    }
+  }, [success, householdId]);
   const handleAddSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -105,32 +145,65 @@ export const Pantry = () => {
         err?.response?.data?.error ||
         err?.response?.data?.status ||
         JSON.stringify(err?.response?.data || {});
-      setError(
-        `Failed to add item. ${backendMessage || "Unknown error"}`
-      );
+      setError(`Failed to add item. ${backendMessage || "Unknown error"}`);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleToggleSelect = (itemId: number) => {
+    setSelectedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedItems.size === pantryItems.length) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(pantryItems.map((item) => item.id)));
+    }
+  };
+
+  const handleConsume = async (itemId: number) => {
+    // TODO: Implement consume functionality
+    console.log("Consume item:", itemId);
+    alert(`Consume functionality for item ${itemId} - to be implemented`);
+  };
+
+  const getUnitName = (unitId: number) => {
+    const unit = units.find((u) => u.id === unitId);
+    return unit ? unit.name : "";
   };
 
   return (
     <div className="dashboard-layout">
       <Sidebar />
       <main className="dashboard-content">
-        <h1>Pantry</h1>
-        <p>Manage all your Available item and discover recipe ideas</p>
+        <h1 className="pantry-title">Pantry</h1>
+        <p className="pantry-subtitle">Manage your available ingredients and discover recipe ideas</p>
 
-        <Button
-          text={showAddForm ? "Cancel" : "Add an item"}
-          onClick={() => {
-            setShowAddForm((prev) => !prev);
-            setError("");
-            setSuccess("");
-          }}
-        />
+        <div className="pantry-actions">
+          <button
+            className="pantry-btn-add"
+            onClick={() => {
+              setShowAddForm((prev) => !prev);
+              setError("");
+              setSuccess("");
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+            Add an item(s)
+          </button>
+        </div>
         {showAddForm && (
           <Form onSubmit={handleAddSubmit} className="dashboard-form">
-            <label>Name:</label>
             <input
               type="text"
               placeholder="Enter Item's name"
@@ -139,7 +212,6 @@ export const Pantry = () => {
               required
               disabled={loading}
             />
-            <label>quantity:</label>
             <input
               type="number"
               placeholder="Qty"
@@ -148,7 +220,6 @@ export const Pantry = () => {
               required
               disabled={loading}
             />
-            <label>Unit</label>
             <select
               value={unitId || ""}
               onChange={(e) => setUnitId(Number(e.target.value))}
@@ -162,7 +233,6 @@ export const Pantry = () => {
                 </option>
               ))}
             </select>
-            <label>Expiry_date:</label>
             <input
               type="date"
               placeholder="Expiration date"
@@ -171,10 +241,9 @@ export const Pantry = () => {
               required
               disabled={loading}
             />
-            <label>Location</label>
             <input
               type="text"
-              placeholder="itesm's Location"
+              placeholder="item's Location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               required
@@ -187,6 +256,56 @@ export const Pantry = () => {
         )}
         {error && <p className="form-error">{error}</p>}
         {success && <p className="form-success">{success}</p>}
+
+        {/* Recipe Discovery Panel */}
+        {pantryItems.length > 0 && (
+          <div className="recipe-discovery-panel">
+            <button className="discover-recipes-btn">
+              <FontAwesomeIcon icon={faUtensils} />
+              Discover Recipes with {selectedItems.size || pantryItems.length} Item{selectedItems.size !== 1 ? "s" : ""}
+            </button>
+            <span className="select-all-link" onClick={handleSelectAll}>
+              Select All
+            </span>
+          </div>
+        )}
+
+        {/* Pantry Items List */}
+        <div className="pantry-items-container">
+          {loadingItems ? (
+            <p>Loading pantry items...</p>
+          ) : pantryItems.length === 0 ? (
+            <p className="no-items">No items in pantry yet. Add some ingredients to get started!</p>
+          ) : (
+            pantryItems.map((item) => {
+              const unitName = getUnitName(item.unit_id);
+              return (
+                <div key={item.id} className="pantry-item-row">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.has(item.id)}
+                    onChange={() => handleToggleSelect(item.id)}
+                    className="item-checkbox"
+                  />
+                  <span className="item-name">
+                    {item.quantity} {unitName} {item.name}
+                  </span>
+                  <div className="item-actions">
+                    <button className="consume-btn" onClick={() => handleConsume(item.id)}>
+                      Consume
+                    </button>
+                    <button className="edit-btn" title="Edit">
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button className="delete-btn" title="Delete">
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </main>
     </div>
   );

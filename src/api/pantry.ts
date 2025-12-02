@@ -21,20 +21,27 @@ export interface members {
       updated_at: string;
     };
   }
+  export interface item {
+    id: number;
+    household_id:number;
+    added_by: number;
+    unit_id:number;
+    name:string;
+    quantity:number;
+    expiration_date:string;
+    location:string;
+    created_at: string;
+    updated_at: string;
+  }
+
   export interface items {
     status: string;
-    payload: {
-      id: number;
-      household_id:number;
-      added_by: number;
-      unit_id:number;
-      name:string;
-      quantity:number;
-      expiration_date:string;
-      location:string;
-      created_at: string;
-      updated_at: string;
-    };
+    payload: item;
+  }
+
+  export interface pantryItemsResponse {
+    status: string;
+    payload: item[];
   }
   export interface unit{
     id: number;
@@ -97,3 +104,9 @@ export const gethousehold_id = async (userid: string): Promise<members> => {
   
   return response.data;
 };
+
+export const getPantryItems = async (household_id: string | number): Promise<pantryItemsResponse> => {
+  const response = await api.get<pantryItemsResponse>(`v0.1/user/pantry_items/${household_id}`);
+  return response.data;
+};
+
