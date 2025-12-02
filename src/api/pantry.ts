@@ -1,4 +1,4 @@
-import api from './axios';
+import api from "./axios";
 
 // Types for API responses
 export interface household {
@@ -12,58 +12,75 @@ export interface household {
   };
 }
 export interface members {
-    status: string;
-    payload: {
-      id: number;
-      household_id:string;
-      user_id: number;
-      created_at: string;
-      updated_at: string;
-    };
-  }
-  export interface items {
-    status: string;
-    payload: {
-      id: number;
-      household_id:number;
-      added_by: number;
-      unit_id:number;
-      name:string;
-      quantity:number;
-      expiration_date:string;
-      location:string;
-      created_at: string;
-      updated_at: string;
-    };
-  }
-  export interface unit{
+  status: string;
+  payload: {
     id: number;
-    name:string;
+    household_id: string;
+    user_id: number;
     created_at: string;
     updated_at: string;
-  }
+  };
+}
+export interface item {
+  id: number;
+  household_id: number;
+  added_by: number;
+  unit_id: number;
+  name: string;
+  quantity: number;
+  expiration_date: string;
+  location: string;
+  created_at: string;
+  updated_at: string;
+}
 
-  export interface unitsResponse {
-    status: string;
-    payload: unit[];
-  }
-export const householdAPI = async (name:string , invite_code:string , userid:string): Promise<household> => {
-    const response = await api.post<household>('v0.1/user/add_update_household/add',{
-        name,
-        invite_code,
-        userid
-    });
-    return response.data;
+export interface items {
+  status: string;
+  payload: item;
+}
+
+export interface pantryItemsResponse {
+  status: string;
+  payload: item[];
+}
+export interface unit {
+  id: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface unitsResponse {
+  status: string;
+  payload: unit[];
+}
+export const householdAPI = async (
+  name: string,
+  invite_code: string,
+  userid: string
+): Promise<household> => {
+  const response = await api.post<household>(
+    "v0.1/user/add_update_household/add",
+    {
+      name,
+      invite_code,
+      userid,
+    }
+  );
+  return response.data;
 };
-export const membersAPI = async (invitecode:string , userid:string): Promise<members> => {
-    const response = await api.post<members>('v0.1/user/add_update_members/add',{
-        invitecode,
-        userid
-    });
-    return response.data;
+export const membersAPI = async (
+  invitecode: string,
+  userid: string
+): Promise<members> => {
+  const response = await api.post<members>("v0.1/user/add_update_members/add", {
+    invitecode,
+    userid,
+  });
+  return response.data;
 };
 export const getUnit = async (): Promise<unitsResponse> => {
-  const response = await api.post<unitsResponse>('v0.1/user/unit/');
+  const response = await api.post<unitsResponse>("v0.1/user/unit/");
   return response.data;
 };
 export const addItem = async (
@@ -75,25 +92,103 @@ export const addItem = async (
   expiry_date: string,
   location: string
 ): Promise<items> => {
-  const response = await api.post<items>('v0.1/user/add_update_pantry_item/add', {
-    household_id: String(household_id),
-    user_id: String(user_id),
-    unit_id: String(unit_id),
-    name: name.trim(),
-    quantity: quantity,
-    expiry_date: expiry_date,
-    location: location.trim(),
-  });
+  const response = await api.post<items>(
+    "v0.1/user/add_update_pantry_item/add",
+    {
+      household_id: String(household_id),
+      user_id: String(user_id),
+      unit_id: String(unit_id),
+      name: name.trim(),
+      quantity: quantity,
+      expiry_date: expiry_date,
+      location: location.trim(),
+    }
+  );
   return response.data;
 };
 
 export const gethousehold_id = async (userid: string): Promise<members> => {
-  const response = await api.post<members>('v0.1/user/add_update_members/id', {
-    userid
+  const response = await api.post<members>("v0.1/user/add_update_members/id", {
+    userid,
   });
   if (response.data.payload?.household_id) {
-    localStorage.setItem('household_id', String(response.data.payload.household_id));
+    localStorage.setItem(
+      "household_id",
+      String(response.data.payload.household_id)
+    );
   }
-  
+
+  return response.data;
+};
+
+export const getPantryItems = async (
+  household_id: string | number
+): Promise<pantryItemsResponse> => {
+  const response = await api.get<pantryItemsResponse>(
+    `v0.1/user/pantry_items/${household_id}`
+  );
+  return response.data;
+};
+export const consumeItem = async (
+  item_id: string | number, user_id: string | number, quantity_consumed: number, reason: string
+): Promise<pantryItemsResponse> => {
+  const response = await api.post<pantryItemsResponse>(
+    `v0.1/user/consume_pantry_item/${item_id}`, {
+    user_id,
+    quantity_consumed,
+    reason
+  }
+  );
+  return response.data;
+};
+
+export interface RecipeIngredient {
+  name: string;
+  quantity: string;
+  unit: string;
+}
+
+export interface Recipe {
+  name: string;
+  ingredients: RecipeIngredient[];
+  instructions: string;
+  tags: string;
+}
+
+export interface RecipeSuggestionsResponse {
+  status: string;
+  payload: {
+    recipes: Recipe[];
+  };
+}
+
+export const getAISuggestions = async (
+  itemIds?: number[]
+): Promise<RecipeSuggestionsResponse> => {
+  let url = "v0.1/user/ai_suggestions";
+  if (itemIds && itemIds.length > 0) {
+    const idsParam = itemIds.join(",");
+    url = `v0.1/user/ai_suggestions/?id=${idsParam}`;
+  }
+  const response = await api.post<RecipeSuggestionsResponse>(url);
+  return response.data;
+};
+
+export interface SaveRecipeResponse {
+  status: string;
+  payload?: any;
+}
+
+export const saveRecipeFromAI = async (
+  recipe: Recipe,
+  user_id: string | number
+): Promise<SaveRecipeResponse> => {
+  const response = await api.post<SaveRecipeResponse>(
+    "v0.1/user/add_recipes_from_ai",
+    {
+      ...recipe,
+      user_id: String(user_id),
+    }
+  );
   return response.data;
 };
