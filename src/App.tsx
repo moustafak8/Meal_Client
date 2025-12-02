@@ -8,6 +8,7 @@ import { LoginProvider } from "./Context/loginContext";
 import { ProtectedRoute } from "./Components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import { Pantry } from "./pages/Pantry";
+import { Recipes } from "./pages/Recipes";
 
 function App() {
   return (
@@ -31,6 +32,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Pantry />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/dashboard/recipes"
+            element={
+              <ProtectedRoute>
+                <Recipes />
               </ProtectedRoute>
             }
           />
