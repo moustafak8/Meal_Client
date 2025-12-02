@@ -20,7 +20,7 @@ import "./pantry.css";
 
 export const Pantry = () => {
   const storedUser = localStorage.getItem("user");
-  let userid: string;
+  let userid: string | null = null;
 
   if (storedUser) {
     try {
@@ -477,6 +477,7 @@ export const Pantry = () => {
             <input
               type="number"
               placeholder="Quantity consumed"
+              value={consumeQty || ""}
               onChange={(e) => setConsumeQty(e.target.valueAsNumber)}
               min={1}
               required

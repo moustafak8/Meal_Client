@@ -135,6 +135,7 @@ export const Sign_up = () => {
           text={loading ? "Signing up..." : "Sign Up"}
           onClick={() => {}}
           disabled={loading}
+          type="submit"
         />
         <span className="last">
           Already have an account? <Link to="/login">Login</Link>
