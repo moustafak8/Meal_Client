@@ -18,26 +18,22 @@ function App() {
           <Route path="/" Component={Home} />
           <Route path="/sign-up" Component={Sign_up} />
           <Route path="/login" Component={Login} />
-          {
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-          }
-          {
-            <Route
-              path="/dashboard/pantry"
-              element={
-                <ProtectedRoute>
-                  <Pantry />
-                </ProtectedRoute>
-              }
-            />
-          }
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/pantry"
+            element={
+              <ProtectedRoute>
+                <Pantry />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </LoginProvider>
