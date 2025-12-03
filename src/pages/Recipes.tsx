@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "../Components/Sidebar";
 import { Form } from "../Components/Form";
-import { getrecipes, getmeals, type Recipe, type MealPlan } from "../api/recipes";
+import {
+  getrecipes,
+  getmeals,
+  addMealPlanEntry,
+  type Recipe,
+  type MealPlan,
+} from "../api/recipes";
 import "./maindashboard.css";
 import "./pantry.css";
 import "./recipes.css";
-
 export const Recipes = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState<string>("");
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showMealPlanModal, setShowMealPlanModal] = useState(false);
@@ -18,6 +24,7 @@ export const Recipes = () => {
   const [mealNotes, setMealNotes] = useState<string>("");
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [selectedMealPlanId, setSelectedMealPlanId] = useState<string>("");
+  const [savingEntry, setSavingEntry] = useState(false);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -33,7 +40,7 @@ export const Recipes = () => {
           err?.response?.data?.error ||
           err?.response?.data?.status ||
           JSON.stringify(err?.response?.data || {});
-        setError(`Failed to load recipes. ${backendMessage || "Unknown error"}`);
+        console.log(`Failed to load recipes. ${backendMessage || "Unknown error"}`);
       } finally {
         setLoading(false);
       }
@@ -81,6 +88,7 @@ export const Recipes = () => {
         <p className="pantry-subtitle">Your collection of favorite recipes</p>
 
         {error && <p className="form-error">{error}</p>}
+        {success && <p className="form-success">{success}</p>}
 
         {/* Recipes List */}
         <div className="pantry-items-container">
@@ -199,8 +207,42 @@ export const Recipes = () => {
 
               <Form
                 className="calendar-form"
-                onSubmit={() => {
-                  closeMealPlanModal();
+                onSubmit={async () => {
+                  if (!selectedRecipe || !selectedMealPlanId || !mealDate) {
+                    return;
+                  }
+                  setSavingEntry(true);
+                  setError("");
+                  setSuccess("");
+                  try {
+                    await addMealPlanEntry({
+                      meal_plan_id: Number(selectedMealPlanId),
+                      recipe_id: selectedRecipe.id,
+                      date: mealDate,
+                      meal_type: mealType,
+                      description: mealNotes.trim() || null,
+                    });
+                    closeMealPlanModal();
+                    setMealDate("");
+                    setMealType("Dinner");
+                    setMealNotes("");
+                    setSelectedMealPlanId("");
+                    setSuccess("Recipe added to meal plan successfully.");
+                  } catch (err: any) {
+                    console.error("Failed to add meal plan entry:", err);
+                    const backendMessage =
+                      err?.response?.data?.message ||
+                      err?.response?.data?.error ||
+                      err?.response?.data?.status ||
+                      JSON.stringify(err?.response?.data || {});
+                    setError(
+                      `Failed to add recipe to meal plan. ${
+                        backendMessage || "Unknown error"
+                      }`
+                    );
+                  } finally {
+                    setSavingEntry(false);
+                  }
                 }}
               >
                 <div className="calendar-form-group">
@@ -262,8 +304,12 @@ export const Recipes = () => {
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="primary-button">
-                    Add to Meal Plan
+                  <button
+                    type="submit"
+                    className="primary-button"
+                    disabled={savingEntry}
+                  >
+                    {savingEntry ? "Adding..." : "Add to Meal Plan"}
                   </button>
                 </div>
               </Form>
