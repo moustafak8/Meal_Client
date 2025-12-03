@@ -33,11 +33,11 @@ export const getShoppingListItems= async(shopping_list_id:number):Promise<Shoppi
     return response.data;
 }
 export const addShoppingListItems= async(body:ShoppingListItems):Promise<ShoppingListItemsResponse>=>{
-    const response=await api.post<ShoppingListItemsResponse>('v0.1/user/add_update_shopping_list_items/add',body);
+    const response=await api.post<ShoppingListItemsResponse>('v0.1/user/add_update_shopping_list_item/add',body);
     return response.data;
 }
 export const updateShoppingListItems= async(body:ShoppingListItems):Promise<ShoppingListItemsResponse>=>{
-    const response=await api.post<ShoppingListItemsResponse>('v0.1/user/add_update_shopping_list_items/update',body);
+    const response=await api.post<ShoppingListItemsResponse>(`v0.1/user/add_update_shopping_list_item/${body.id}`,body);
     return response.data;
 }
 export const getShoppingList= async():Promise<ShoppingListResponse>=>{
@@ -46,5 +46,9 @@ export const getShoppingList= async():Promise<ShoppingListResponse>=>{
 }
 export const addShoppingList= async(body:ShoppingList):Promise<ShoppingListResponse>=>{
     const response=await api.post<ShoppingListResponse>('v0.1/user/add_update_shopping_list/add',body);
+    return response.data;
+}
+export const deleteShoppingListItems= async(id:number):Promise<ShoppingListResponse>=>{
+    const response=await api.post<ShoppingListResponse>(`v0.1/user/delete_shopping_list_item/${id}`);
     return response.data;
 }
