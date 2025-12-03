@@ -9,7 +9,7 @@ import { ProtectedRoute } from "./Components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import { Pantry } from "./pages/Pantry";
 import { Recipes } from "./pages/Recipes";
-
+import { Mealplan } from "./pages/Mealplan";
 function App() {
   return (
     <LoginProvider>
@@ -40,6 +40,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Recipes />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/dashboard/meal-plan"
+            element={
+              <ProtectedRoute>
+                <Mealplan />
               </ProtectedRoute>
             }
           />
