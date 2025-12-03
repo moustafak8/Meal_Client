@@ -3,6 +3,7 @@ export interface ShoppingList{
     id:number;
     household_id:number;
     user_id:number;
+    meal_plan_id:number|null;
     name:string;
     cost:number;
     status:string;
