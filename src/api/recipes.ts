@@ -29,7 +29,7 @@ export interface MealPlanEntries{
 
 export interface MealPlanEntryRequest {
   meal_plan_id: number;
-  recipe_id: number;
+  recipe_id?: number | null;
   date: string;
   meal_type: string;
   description?: string | null;

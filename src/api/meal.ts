@@ -1,5 +1,4 @@
 import api from "./axios";
-import type { mealplanresponse } from "./recipes";
 export interface MealPlanEntries{
     id: number;
     meal_plan_id:number;
@@ -13,9 +12,8 @@ export interface MealPlanEntries{
     payload:MealPlanEntries[];
   }
   export interface MealPlan {
-    id: number;
     household_id:number;
-    created_by:number;
+    user_id:number;
     name: string;
     start_date: string;
     created_at: string;
