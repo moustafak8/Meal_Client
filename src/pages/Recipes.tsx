@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "../Components/Sidebar";
 import { Form } from "../Components/Form";
-import { getrecipes, type Recipe } from "../api/recipes";
+import { getrecipes, getmeals, type Recipe, type MealPlan } from "../api/recipes";
 import "./maindashboard.css";
 import "./pantry.css";
 import "./recipes.css";
@@ -16,6 +16,8 @@ export const Recipes = () => {
   const [mealDate, setMealDate] = useState<string>("");
   const [mealType, setMealType] = useState<string>("Dinner");
   const [mealNotes, setMealNotes] = useState<string>("");
+  const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
+  const [selectedMealPlanId, setSelectedMealPlanId] = useState<string>("");
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -37,6 +39,19 @@ export const Recipes = () => {
       }
     };
     fetchRecipes();
+  }, []);
+
+  useEffect(() => {
+    const fetchMealPlans = async () => {
+      try {
+        const response = await getmeals();
+        setMealPlans(response.payload || []);
+      } catch (err) {
+        console.error("Failed to fetch meal plans:", err);
+      }
+    };
+
+    fetchMealPlans();
   }, []);
 
   const handleViewDetails = (recipe: Recipe) => {
@@ -185,7 +200,6 @@ export const Recipes = () => {
               <Form
                 className="calendar-form"
                 onSubmit={() => {
-                  // For now just close the modal. Hook up to backend later.
                   closeMealPlanModal();
                 }}
               >
@@ -198,6 +212,23 @@ export const Recipes = () => {
                     onChange={(e) => setMealDate(e.target.value)}
                     required
                   />
+                </div>
+
+                <div className="calendar-form-group">
+                  <label className="calendar-label">Meal Plan</label>
+                  <select
+                    className="calendar-input"
+                    value={selectedMealPlanId}
+                    onChange={(e) => setSelectedMealPlanId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select a meal plan</option>
+                    {mealPlans.map((plan) => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="calendar-form-group">
