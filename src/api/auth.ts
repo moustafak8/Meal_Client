@@ -1,6 +1,4 @@
 import api from './axios';
-
-// Types for API responses
 export interface LoginResponse {
   status: string;
   payload: {
@@ -27,7 +25,6 @@ export interface RegisterResponse {
   };
 }
 
-// Login API function
 export const loginAPI = async (email: string, password: string): Promise<LoginResponse> => {
   const response = await api.post<LoginResponse>('/login', {
     email,
@@ -35,8 +32,6 @@ export const loginAPI = async (email: string, password: string): Promise<LoginRe
   });
   return response.data;
 };
-
-// Register API function
 export const registerAPI = async (email: string, password: string, name: string ,user_type_id:number): Promise<RegisterResponse> => {
   const response = await api.post<RegisterResponse>('/register', {
     email,

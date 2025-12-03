@@ -8,7 +8,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor - attach token to requests
+//attach token to requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -32,7 +32,7 @@ api.interceptors.response.use(
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login (will be handled by ProtectedRoute)
+      
      // window.location.href = '/login';
     }
     return Promise.reject(error);
