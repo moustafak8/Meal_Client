@@ -281,7 +281,7 @@ export const Mealplan = () => {
       <main className="dashboard-content">
         <div className="calendar-header">
           <div className="calendar-header-left">
-            <h1 className="calendar-title">Calendar</h1>
+            <h1 className="calendar-title">Meal Plans</h1>
             <p className="calendar-subtitle">
               View and manage your planned meals
             </p>
@@ -306,7 +306,7 @@ export const Mealplan = () => {
         </div>
 
         <div className="calendar-meal-plan-selector">
-          <label className="calendar-select-label">Select Meal Plan:</label>
+          <label className="calendar-select-label">Choose Meal Plan:</label>
           <select
             className="calendar-select"
             value={selectedMealPlanId || ""}
