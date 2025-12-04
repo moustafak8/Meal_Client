@@ -9,7 +9,8 @@ import { ProtectedRoute } from "./Components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import { Pantry } from "./pages/Pantry";
 import { Recipes } from "./pages/Recipes";
-
+import { Mealplan } from "./pages/Mealplan";
+import { Shoppinglist } from "./pages/Shoppinglist";
 function App() {
   return (
     <LoginProvider>
@@ -40,6 +41,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Recipes />
+              </ProtectedRoute>
+            }
+          />
+             <Route
+            path="/dashboard/shopping-list"
+            element={
+              <ProtectedRoute>
+                <Shoppinglist />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/dashboard/meal-plan"
+            element={
+              <ProtectedRoute>
+                <Mealplan />
               </ProtectedRoute>
             }
           />

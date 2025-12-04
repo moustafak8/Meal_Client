@@ -1,0 +1,406 @@
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.calendar-header-left {
+  flex: 1;
+  min-width: 200px;
+}
+
+.calendar-title {
+  font-size: 2.5rem;
+  color: #f97316;
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+}
+
+.calendar-subtitle {
+  color: #22c55e;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.calendar-header-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.calendar-date-navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.calendar-nav-button {
+  background: none;
+  border: none;
+  color: #f97316;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.calendar-nav-button:hover {
+  background-color: #fff7ed;
+}
+
+.calendar-date-range {
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+  min-width: 150px;
+  text-align: center;
+}
+
+/* Meal Plan Selector */
+.calendar-meal-plan-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.calendar-select-label {
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.calendar-select {
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #111827;
+  font-size: 0.9rem;
+  min-width: 200px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.calendar-select:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.calendar-add-plan-button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  background-color: #22c55e;
+  color: white;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.calendar-add-plan-button:hover {
+  background-color: #16a34a;
+}
+
+/* Calendar Days Container */
+.calendar-days-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.calendar-day-card {
+  background-color: #ffffff;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.calendar-day-card:hover {
+  border-color: #f97316;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
+}
+
+.calendar-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.calendar-day-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.calendar-add-meal-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #f97316;
+  background-color: #ffffff;
+  color: #f97316;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar-add-meal-button:hover:not(:disabled) {
+  background-color: #f97316;
+  color: white;
+}
+
+.calendar-add-meal-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.calendar-no-meals {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+.calendar-no-days {
+  text-align: center;
+  color: #6b7280;
+  font-size: 1rem;
+  padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+}
+
+/* Meal Entries List */
+.calendar-meals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.calendar-meal-entry {
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.calendar-meal-entry:hover {
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+}
+
+.calendar-meal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.calendar-meal-type {
+  display: inline-block;
+  background-color: #f97316;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.calendar-meal-recipe {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.calendar-meal-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* Modal Styles (reusing from recipes.css) */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 40;
+}
+
+.calendar-modal {
+  width: 100%;
+  max-width: 420px;
+  background-color: #fffbeb;
+  border-radius: 1.5rem;
+  padding: 1.75rem 2rem 1.5rem;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+  border: 1px solid #fed7aa;
+}
+
+.calendar-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.calendar-modal-title {
+  margin: 0;
+  color: #111827;
+  font-size: 1.3rem;
+}
+
+.calendar-modal-subtitle {
+  margin: 0.35rem 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.calendar-modal-close {
+  border: none;
+  background: #fffbeb;
+  border-radius: 9999px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.calendar-modal-close:hover {
+  background-color: #fed7aa;
+  color: #4b5563;
+}
+
+.calendar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.calendar-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.calendar-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ea580c;
+}
+
+.calendar-input {
+  border-radius: 0.75rem;
+  border: 1px solid #fed7aa;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  color: #111827;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.calendar-input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(248, 113, 22, 0.2);
+}
+
+.calendar-textarea {
+  border-radius: 0.75rem;
+  border: 1px solid #fed7aa;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  color: #111827;
+  outline: none;
+  min-height: 90px;
+  resize: vertical;
+  background-color: #ffffff;
+}
+
+.calendar-textarea:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(248, 113, 22, 0.2);
+}
+
+.calendar-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.primary-button {
+  background-color: #f97316;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 4px 12px rgba(248, 113, 22, 0.35);
+}
+
+.primary-button:hover:not(:disabled) {
+  background-color: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(248, 113, 22, 0.4);
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  background-color: #ffffff;
+  color: #f97316;
+  border-radius: 9999px;
+  border: 1px solid #fed7aa;
+  padding: 0.55rem 1.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.secondary-button:hover {
+  background-color: #fff7ed;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.form-error {
+  margin-top: 0.75rem;
+  color: #fca5a5;
+}
+
+.form-success {
+  margin-top: 0.75rem;
+  color: #4ade80;
+}
+
