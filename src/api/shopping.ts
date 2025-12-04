@@ -52,3 +52,21 @@ export const deleteShoppingListItems= async(id:number):Promise<ShoppingListRespo
     const response=await api.post<ShoppingListResponse>(`v0.1/user/delete_shopping_list_item/${id}`);
     return response.data;
 }
+
+export interface GeneratedShoppingListItem {
+    name: string;
+    quantity: string;
+    unit: string;
+}
+
+export interface GenerateShoppingListResponse {
+    status: string;
+    payload: {
+        shopping_list: GeneratedShoppingListItem[];
+    };
+}
+
+export const generateShoppingList = async (): Promise<GenerateShoppingListResponse> => {
+    const response = await api.post<GenerateShoppingListResponse>('v0.1/user/generate_shopping_list');
+    return response.data;
+};

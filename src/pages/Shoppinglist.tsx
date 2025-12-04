@@ -10,8 +10,10 @@ import {
   addShoppingListItems,
   updateShoppingListItems,
   deleteShoppingListItems,
+  generateShoppingList,
   type ShoppingListItems,
   type ShoppingList,
+  type GeneratedShoppingListItem,
 } from "../api/shopping";
 import { getUnit, type unit } from "../api/pantry";
 import "./maindashboard.css";
@@ -28,6 +30,8 @@ export const Shoppinglist = () => {
   const [selectedShoppingListId, setSelectedShoppingListId] = useState<number | null>(null);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showAddListModal, setShowAddListModal] = useState(false);
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [generatedItems, setGeneratedItems] = useState<GeneratedShoppingListItem[]>([]);
   // Form states for adding item
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState<number>(0);
@@ -240,6 +244,91 @@ export const Shoppinglist = () => {
     return unit ? unit.name : "";
   };
 
+  const getUnitIdByName = (unitName: string): number | null => {
+    const unit = units.find((u) => u.name.toLowerCase() === unitName.toLowerCase());
+    return unit ? unit.id : null;
+  };
+
+  const handleGenerateFromMealPlan = async () => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    setGeneratedItems([]);
+    setShowGenerateModal(true);
+
+    try {
+      const response = await generateShoppingList();
+      if (response.payload && response.payload.shopping_list) {
+        setGeneratedItems(response.payload.shopping_list);
+      } else {
+        setError("No items generated from meal plan");
+      }
+    } catch (err: any) {
+      console.error("Failed to generate shopping list:", err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.status ||
+        JSON.stringify(err?.response?.data || {});
+      setError(`Failed to generate shopping list. ${backendMessage || "Unknown error"}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveGeneratedItems = async () => {
+    if (!selectedShoppingListId || generatedItems.length === 0) {
+      setError("Please select a shopping list and ensure there are items to save");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      // Save all generated items
+      for (const item of generatedItems) {
+        const unitId = getUnitIdByName(item.unit);
+        if (!unitId) {
+          console.warn(`Unit "${item.unit}" not found, skipping item "${item.name}"`);
+          continue;
+        }
+
+        await addShoppingListItems({
+          id: 0,
+          shopping_list_id: selectedShoppingListId,
+          name: item.name,
+          unit_id: unitId,
+          required_amount: parseFloat(item.quantity) || 0,
+          isbought: false,
+          created_at: "",
+          updated_at: "",
+        });
+      }
+
+      setSuccess("Items saved to shopping list successfully!");
+      setShowGenerateModal(false);
+      setGeneratedItems([]);
+      
+      // Refresh shopping list items
+      if (selectedShoppingListId) {
+        const response = await getShoppingListItems(selectedShoppingListId);
+        setShoppingListItems(response.payload || []);
+      }
+    } catch (err: any) {
+      console.error("Failed to save generated items:", err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.data?.status ||
+        JSON.stringify(err?.response?.data || {});
+      setError(`Failed to save items. ${backendMessage || "Unknown error"}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const completedCount = shoppingListItems.filter((item) => item.isbought).length;
   const totalCount = shoppingListItems.length;
   const progressText = `${completedCount} of ${totalCount} items completed`;
@@ -284,6 +373,13 @@ export const Shoppinglist = () => {
             onClick={() => setShowAddListModal(true)}
           >
             + New List
+          </button>
+          <button
+            className="shopping-generate-button"
+            onClick={handleGenerateFromMealPlan}
+            disabled={loading}
+          >
+            Generate from Meal Plan
           </button>
         </div>
 
@@ -458,6 +554,77 @@ export const Shoppinglist = () => {
                   </button>
                 </div>
               </Form>
+            </div>
+          </div>
+        )}
+
+        {/* Generate from Meal Plan Modal */}
+        {showGenerateModal && (
+          <div className="overlay" onClick={() => {
+            setShowGenerateModal(false);
+            setGeneratedItems([]);
+          }}>
+            <div className="calendar-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="calendar-modal-header">
+                <div>
+                  <h2 className="calendar-modal-title">Generated Shopping List</h2>
+                  <p className="calendar-modal-subtitle">Items generated from your meal plan</p>
+                </div>
+                <button
+                  type="button"
+                  className="calendar-modal-close"
+                  onClick={() => {
+                    setShowGenerateModal(false);
+                    setGeneratedItems([]);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="calendar-form">
+                {loading && !generatedItems.length ? (
+                  <p>Generating shopping list...</p>
+                ) : generatedItems.length === 0 ? (
+                  <p className="shopping-empty">No items generated</p>
+                ) : (
+                  <div className="shopping-items-list">
+                    {generatedItems.map((item, index) => (
+                      <div key={index} className="shopping-item-card">
+                        <div className="shopping-item-info">
+                          <span className="shopping-item-name">{item.name}</span>
+                          <span className="shopping-item-amount">
+                            {item.quantity} {item.unit}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="calendar-modal-footer">
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => {
+                      setShowGenerateModal(false);
+                      setGeneratedItems([]);
+                    }}
+                  >
+                    Close
+                  </button>
+                  {generatedItems.length > 0 && (
+                    <button
+                      type="button"
+                      className="primary-button"
+                      onClick={handleSaveGeneratedItems}
+                      disabled={loading || !selectedShoppingListId}
+                    >
+                      {loading ? "Saving..." : "Save to Shopping List"}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
